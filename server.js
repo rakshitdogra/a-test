@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// --- System Pre-Prompt (we inject it as the first content) ---
+// --- System Pre-Prompt ---
 const SYSTEM_PROMPT = `
 You are AyurSutra Companion — a warm, empathetic digital assistant designed to support patients undergoing Panchakarma therapies.
 
@@ -34,9 +34,7 @@ Interaction Style:
 app.post("/api/chat", async (req, res) => {
   try {
     const { message } = req.body;
-    if (!message) {
-      return res.status(400).json({ error: "Message is required." });
-    }
+    if (!message) return res.status(400).json({ error: "Message is required." });
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
@@ -48,8 +46,8 @@ app.post("/api/chat", async (req, res) => {
         },
         body: JSON.stringify({
           contents: [
-            { parts: [{ text: SYSTEM_PROMPT }] },
-            { parts: [{ text: message }] }
+            { role: "system", parts: [{ text: SYSTEM_PROMPT }] },  // system role
+            { role: "user", parts: [{ text: message }] }           // user role
           ]
         })
       }
