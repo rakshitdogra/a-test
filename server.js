@@ -9,21 +9,20 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// --- Pre-Prompt ---
-const SYSTEM_PROMPT = `
+// --- Pre-Prompt Text ---
+const PRE_PROMPT = `
 You are AyurSutra Companion — an empathetic assistant for Panchakarma patients.
 Provide guidance, support, and reminders. Never give medical prescriptions or diagnoses.
 Always remain clear, safe, and compassionate.
 `;
 
-// Chat route
 app.post("/api/chat", async (req, res) => {
   try {
     const { message } = req.body;
     if (!message) return res.status(400).json({ error: "Message is required." });
 
-    // Combine system pre-prompt + user message as a single "user" content
-    const prompt = SYSTEM_PROMPT + "\n\nUser: " + message;
+    // Combine pre-prompt + user message
+    const prompt = `${PRE_PROMPT}\n\nUser: ${message}`;
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
